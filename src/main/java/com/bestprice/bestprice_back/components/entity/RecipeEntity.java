@@ -13,6 +13,7 @@ public class RecipeEntity {
 
     @Id
     private Integer rcpSno;
+
     private String title;
     private String ckgNm;
     private String rgtrId;
@@ -31,11 +32,18 @@ public class RecipeEntity {
     private String mainThumb;
     private java.time.LocalDateTime firstRegDt;
 
+    // 재료 목록과의 관계 설정
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<IngredientEntity> ingredientsList = new ArrayList<>();
 
+    // 조리 단계와의 관계 설정
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<StepEntity> steps = new ArrayList<>();
+
+    // 날짜 문자열을 LocalDateTime으로 변환하는 메서드
     public void setFirstRegDtFromString(String dateString) {
-        this.firstRegDt = java.time.LocalDateTime.parse(dateString,
+        this.firstRegDt = java.time.LocalDateTime.parse(
+                dateString,
                 java.time.format.DateTimeFormatter.ofPattern("yyyyMMddHHmmss"));
     }
 }
