@@ -1,11 +1,14 @@
 package com.bestprice.bestprice_back.components.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
 @Data
 @Entity
 @Table(name = "recipe_ingredients")
+@JsonIgnoreProperties("recipe")
 public class IngredientEntity {
 
     @Id

@@ -1,5 +1,8 @@
 package com.bestprice.bestprice_back.components.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -12,12 +15,18 @@ public class StepEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long stepId;
 
-    @Column(name = "rcp_sno", nullable = false)
-    private Integer rcpSno;
+    @ManyToOne
+    @JsonIgnoreProperties("recipe")
+    @JoinColumn(name = "rcp_sno", nullable = false)
+    @JsonBackReference
+    private RecipeEntity recipe;
 
     @Column(length = 1000, nullable = false)
     private String step;
 
     @Column(nullable = false)
     private int stepOrder;
+
+    @Column(name = "step_img")
+    private String stepImg;
 }

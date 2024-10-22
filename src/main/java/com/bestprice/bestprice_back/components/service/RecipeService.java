@@ -21,6 +21,12 @@ public class RecipeService {
     private final RecipeRepository recipeRepository;
     private final WebCrawlerService webCrawlerService;
 
+    // ID로 레시피 조회
+    public RecipeEntity getRecipeById(Integer id) {
+        return recipeRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("레시피를 찾을 수 없습니다: " + id));
+    }
+
     public RecipeService(RecipeRepository recipeRepository, WebCrawlerService webCrawlerService) {
         this.recipeRepository = recipeRepository;
         this.webCrawlerService = webCrawlerService;
@@ -162,4 +168,5 @@ public class RecipeService {
             throw new RuntimeException("레시피 저장 실패", e);
         }
     }
+
 }
