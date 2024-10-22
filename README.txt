@@ -1,6 +1,9 @@
 https://drive.google.com/file/d/1i408UufMx7IWmco8aQVCHkJ1TiXCNmxf/view?usp=drive_link
 csv 원본 파일
 
+브라우저로 데이터 저장하는법
+http://localhost:8080/api/recipes/csv/load (접속)
+
 -- recipes 테이블 생성 (rcp_sno를 기본 키로 사용)
 CREATE TABLE recipes (
     rcp_sno INT PRIMARY KEY,               -- 레시피 번호 (고유 식별자)
