@@ -27,14 +27,16 @@ CREATE TABLE recipes (
     first_reg_dt TIMESTAMP                 -- 최초 등록일
 ) ENGINE=InnoDB;
 
--- recipe_steps 테이블 생성
+-- 레시피 단계 테이블 생성
 CREATE TABLE recipe_steps (
-    step_id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    rcp_sno INT,                           -- 외래 키 (레시피 번호)
-    step VARCHAR(1000),                    -- 단계 텍스트
-    step_order INT,                        -- 단계 순서
-    FOREIGN KEY (rcp_sno) REFERENCES recipes(rcp_sno) ON DELETE CASCADE
+    step_id BIGINT AUTO_INCREMENT PRIMARY KEY,  -- 단계 ID
+    rcp_sno INT NOT NULL,                       -- 외래 키 (레시피 번호)
+    step VARCHAR(1000) NOT NULL,                -- 단계 설명
+    step_order INT NOT NULL,                    -- 단계 순서
+    step_img VARCHAR(500),                      -- 단계 이미지 URL
+    CONSTRAINT fk_recipe_step FOREIGN KEY (rcp_sno) REFERENCES recipes(rcp_sno) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
 
 
 CREATE TABLE recipe_ingredients (
@@ -45,3 +47,4 @@ CREATE TABLE recipe_ingredients (
     amount VARCHAR(50),                 -- 양 (예: "2공기")
     CONSTRAINT fk_recipe FOREIGN KEY (rcp_sno) REFERENCES recipes(rcp_sno) ON DELETE CASCADE
 ) ENGINE=InnoDB;
+
