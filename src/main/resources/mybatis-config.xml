@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+    <typeAliases>
+        <!-- 필요에 따라 여기에 도메인 클래스 별칭을 추가 -->
+    </typeAliases>
+    <mappers>
+    </mappers>
+</configuration>
