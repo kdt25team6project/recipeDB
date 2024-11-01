@@ -1,30 +1,59 @@
 package com.bestprice.bestprice_back.config;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-
 import javax.sql.DataSource;
 
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionFactoryBean;
+import org.mybatis.spring.SqlSessionTemplate;
+import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
+
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource ; 
+
 @Configuration
+@PropertySource("classpath:/application.properties") 
+@MapperScan("kdt.fullstack.project.dao")
 public class DatabaseConfig {
 
+    @Autowired
+    private ApplicationContext context;
+    
     @Bean
-    public DataSource dataSource() {
-        HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/test_db"); // JDBC URL
-        config.setUsername("root"); // MySQL 사용자 이름
-        config.setPassword("0000"); // MySQL 비밀번호
-        config.setDriverClassName("com.mysql.cj.jdbc.Driver"); // 드라이버 클래스
+    @ConfigurationProperties(prefix = "spring.datasource.hikari")
+    public HikariConfig hikariConfig() {
+        return new HikariConfig();
+    } 
 
-        // HikariCP 추가 설정 (선택 사항)
-        config.setMaximumPoolSize(10);
-        config.setMinimumIdle(5);
-        config.setIdleTimeout(30000);
-        config.setConnectionTimeout(20000);
-        config.setMaxLifetime(1800000);
-
-        return new HikariDataSource(config);
+    @Bean
+    public DataSource datasource() {
+        return new HikariDataSource(hikariConfig()) ; 
     }
+
+    @Bean
+    public SqlSessionFactory sqlSessionFactory() throws Exception {
+        SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
+        factoryBean.setDataSource(datasource());
+        factoryBean.setMapperLocations( context.getResources("classpath:/mappers/**/*Mapper.xml") );
+        factoryBean.setConfigLocation(  context.getResource("classpath:/mybatis-config.xml"));
+
+        return factoryBean.getObject() ;
+    }
+
+    @Bean
+    public SqlSessionTemplate sqlSession() throws Exception {
+        return new SqlSessionTemplate(sqlSessionFactory());
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "mybatis.configuration")
+    public org.apache.ibatis.session.Configuration myConfiguration() {
+        return new org.apache.ibatis.session.Configuration();
+    }
+
 }

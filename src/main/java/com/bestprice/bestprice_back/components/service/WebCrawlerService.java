@@ -1,6 +1,6 @@
 package com.bestprice.bestprice_back.components.service;
 
-import com.bestprice.bestprice_back.components.entity.RecipeEntity;
+import com.bestprice.bestprice_back.components.domain.RecipeDto;
 import com.bestprice.bestprice_back.components.repository.RecipeRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -26,7 +26,7 @@ public class WebCrawlerService {
     }
 
     @Transactional
-    public RecipeEntity crawlRecipe(int rcpSno) {
+    public RecipeDto crawlRecipe(int rcpSno) {
         String url = "https://www.10000recipe.com/recipe/" + rcpSno;
 
         // 이미 레시피가 존재하는지 확인
@@ -35,7 +35,7 @@ public class WebCrawlerService {
             return recipeRepository.findById(rcpSno).orElse(null);
         }
 
-        RecipeEntity recipe = new RecipeEntity();
+        RecipeDto recipe = new RecipeDto();
         recipe.setRcpSno(rcpSno);
 
         try {
@@ -94,7 +94,7 @@ public class WebCrawlerService {
     }
 
     // 새롭게 정의된 mergeCrawledData 메서드
-    public void mergeCrawledData(RecipeEntity crawledRecipe, RecipeEntity csvRecipe) {
+    public void mergeCrawledData(RecipeDto crawledRecipe, RecipeDto csvRecipe) {
         if (crawledRecipe.getMainThumb() != null) {
             csvRecipe.setMainThumb(crawledRecipe.getMainThumb());
         }

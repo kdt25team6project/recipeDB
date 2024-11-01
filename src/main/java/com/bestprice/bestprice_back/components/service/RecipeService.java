@@ -1,7 +1,7 @@
 package com.bestprice.bestprice_back.components.service;
 
-import com.bestprice.bestprice_back.components.entity.IngredientEntity;
-import com.bestprice.bestprice_back.components.entity.RecipeEntity;
+import com.bestprice.bestprice_back.components.domain.IngredientDto;
+import com.bestprice.bestprice_back.components.domain.RecipeDto;
 import com.bestprice.bestprice_back.components.repository.RecipeRepository;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ public class RecipeService {
     private final WebCrawlerService webCrawlerService;
 
     // ID로 레시피 조회
-    public RecipeEntity getRecipeById(Integer id) {
+    public RecipeDto getRecipeById(Integer id) {
         return recipeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("레시피를 찾을 수 없습니다: " + id));
     }
@@ -34,7 +34,7 @@ public class RecipeService {
 
     @Transactional(propagation = Propagation.REQUIRED)
     public int loadCsvAndCrawlRecipes() {
-        List<RecipeEntity> recipes = new ArrayList<>();
+        List<RecipeDto> recipes = new ArrayList<>();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(
                 new ClassPathResource("TB_RECIPE_SEARCH-20231130.csv").getInputStream(),
@@ -57,20 +57,20 @@ public class RecipeService {
                     }
 
                     // CSV에서 레시피 파싱
-                    RecipeEntity recipe = parseRecipeFromCsv(fields);
+                    RecipeDto recipe = parseRecipeFromCsv(fields);
                     if (recipe == null) {
                         System.err.println("CSV 레코드 파싱 실패: " + line);
                         continue;
                     }
 
-                    Optional<RecipeEntity> existingRecipe = recipeRepository.findByRcpSno(recipe.getRcpSno());
+                    Optional<RecipeDto> existingRecipe = recipeRepository.findByRcpSno(recipe.getRcpSno());
                     if (existingRecipe.isPresent()) {
                         System.out.println("이미 존재하는 레시피: " + recipe.getRcpSno());
                         continue;
                     }
 
                     // 크롤링된 데이터와 병합
-                    RecipeEntity crawledRecipe = webCrawlerService.crawlRecipe(recipe.getRcpSno());
+                    RecipeDto crawledRecipe = webCrawlerService.crawlRecipe(recipe.getRcpSno());
                     webCrawlerService.mergeCrawledData(crawledRecipe, recipe);
 
                     // 재료 정보 파싱 및 추가
@@ -98,9 +98,9 @@ public class RecipeService {
         return recipes.size();
     }
 
-    private RecipeEntity parseRecipeFromCsv(String[] fields) {
+    private RecipeDto parseRecipeFromCsv(String[] fields) {
         try {
-            RecipeEntity recipe = new RecipeEntity();
+            RecipeDto recipe = new RecipeDto();
             recipe.setRcpSno(Integer.parseInt(fields[0].trim()));
             recipe.setTitle(fields[1].trim());
             recipe.setCkgNm(fields[2].trim());
@@ -125,7 +125,7 @@ public class RecipeService {
         }
     }
 
-    private void parseSectionedIngredients(RecipeEntity recipe, String ingredientsString) {
+    private void parseSectionedIngredients(RecipeDto recipe, String ingredientsString) {
         String[] sections = ingredientsString.split("\\[");
 
         for (String section : sections) {
@@ -141,7 +141,7 @@ public class RecipeService {
                 String name = details[0].trim();
                 String amount = details.length > 1 ? details[1].trim() : null;
 
-                IngredientEntity ingredient = new IngredientEntity();
+                IngredientDto ingredient = new IngredientDto();
                 ingredient.setRecipe(recipe);
                 ingredient.setSectionName(sectionName);
                 ingredient.setName(name);
@@ -153,7 +153,7 @@ public class RecipeService {
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void saveRecipes(List<RecipeEntity> recipes) {
+    public void saveRecipes(List<RecipeDto> recipes) {
         if (recipes.isEmpty()) {
             System.err.println("저장할 레시피가 없습니다.");
             return;
